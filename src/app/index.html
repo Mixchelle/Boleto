@@ -68,6 +68,7 @@
       <p>CNPJ: {{cliente.cnpj}}</p>
       <p>Valor Total: R$ {{cliente.valorTotal}}</p>
       <p>Qtd de parcelas: {{cliente.quantidadeParcelas}}</p>
+      <button ng-click="editarValores()">Editar valores</button>
       <h4>Boletos</h4>
       <div class="boletos-container">
         <table>
@@ -77,6 +78,7 @@
               <th>Parcela</th>
               <th>Data de Vencimento</th>
               <th>Nova data de Vencimento</th>
+              <th>desconto</th>
               <th>Ação</th>
             </tr>
           </thead>
@@ -88,6 +90,7 @@
               <td>
                 <input type="date" ng-model="boleto.novaDataEmissao" title="Nova Data de Emissão" placeholder="Digite a nova data de emissão" ng-change="calcularValorParcela(boleto)" />
               </td>
+              <td><input type="numer" placeholder="digite o desconto"  ng-model="boleto.desconto"></td>
               <td>
                 <button class="seta" ng-click="gerarSegundaVia(boleto)">Emita 2ª via do boleto</button>
               </td>

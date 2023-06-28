@@ -53,11 +53,10 @@ angular.module('meuApp', []).controller('emissaoBoletosController', function($sc
     quantidadeParcelas: 1,
     valorParcela: 0,
     vencimentoPrimeiraParcela: '',
-    juros: 0,
     descontos: 0,
     boletos: [],
     novoValor: 0,
-    novaDataEmissao: '' // Nova propriedade para salvar a nova data de emissão
+    novaDataEmissao: '',
   };
 
   const reiniciarTela = function() {
@@ -141,7 +140,7 @@ angular.module('meuApp', []).controller('emissaoBoletosController', function($sc
       boleto.parcelasDetalhes.push(parcela);
     }
 
-    $scope.cliente.boletos.push(boleto);
+    $scope.c        desconto = parcela.valorParcela * 0.05;liente.boletos.push(boleto);
     $scope.clientesAtivos.push(angular.copy($scope.cliente));
     salvarClientesAtivos($scope.clientesAtivos);
     alert('Boletos gerados com sucesso!');
@@ -167,25 +166,30 @@ angular.module('meuApp', []).controller('emissaoBoletosController', function($sc
     salvarClientesAtivos($scope.clientesAtivos);
   };
 
-  $scope.gerarSegundaVia = function(parcela) {
-    $scope.cliente.novaDataEmissao = parcela.novaDataEmissao; // Salva a nova data de emissão no estado do cliente
-    const novaDataEmissao = new Date(parcela.novaDataEmissao);
-    const dataOriginalVencimento = new Date(parcela.dataVencimento);
+  $scope.gerarSegundaVia = function(boleto) {
+    const novaDataEmissao = new Date(boleto.novaDataEmissao);
+    const valorDesconto = parseFloat(boleto.desconto);
+    const dataOriginalVencimento = new Date(boleto.dataVencimento);
     const diffDias = Math.ceil((novaDataEmissao - dataOriginalVencimento) / (1000 * 60 * 60 * 24));
-    let juros = 0;
-    let desconto = 0;
-
+    let desconto = parseFloat(valorDesconto);
+  
     if (diffDias > 3) {
-      juros = parcela.valorParcela * 0.02;
+      alert(`Nova data de vencimento: ${novaDataEmissao.toISOString().substring(0, 10)}\nValor do desconto: R$ 0.00\nValor da parcela: R$ ${boleto.valorParcela.toFixed(2)}`);
     } else if (novaDataEmissao > dataOriginalVencimento) {
       const diffDiasVencimento = Math.floor((novaDataEmissao - dataOriginalVencimento) / (1000 * 60 * 60 * 24));
       if (diffDiasVencimento >= 30) {
-        desconto = parcela.valorParcela * 0.05;
+        boleto.valorParcela -= desconto;
       }
+      alert(`Nova data de vencimento: ${novaDataEmissao.toISOString().substring(0, 10)}\nValor do desconto: R$ ${desconto.toFixed(2)}\nValor da parcela: R$ ${boleto.valorParcela.toFixed(2)}`);
+    } else {
+      alert('Não houve alteração nos valores.');
     }
+  
+    salvarClientesAtivos($scope.clientesAtivos);
+  };
 
-    const novoValor = parcela.valorParcela + juros - desconto;
-    alert(`Valor Atualizado: R$ ${novoValor.toFixed(2)}\nJuros: R$ ${juros.toFixed(2)}\nDesconto: R$ ${desconto.toFixed(2)}`);
+  $scope.editarValores = function() {
+    alert('Dados alterados com sucesso!');
   };
 
   // Inicialização
