@@ -1,11 +1,21 @@
 {
+  "homepage": "https://Miixchelle.github.io/Boleto",
   "name": "tela_boleto",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "ng build",
+    "predeploy": "npm run build",
+    "deploy": "ng build --prod --base-href=/Boleto/ && npx ngh --dir=dist/Boleto"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "gh-pages": "^5.0.0"
+  },
+  "devDependencies": {
+    "angular-cli-ghpages": "^1.0.6"
+  }
 }
