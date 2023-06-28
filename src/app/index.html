@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="meuApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boletos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body ng-controller="emissaoBoletosController">
+
+  <div class="header">
+    <header>
+        <h1>Boletos</h1>
+    </header>
+</div>
+
+<div class="container">
+  <div class="form-container">
+    <div class="form-group">
+      <label for="codigoCliente">Número do Cliente:</label>
+      <input type="text" id="codigoCliente" ng-model="cliente.codigoCliente" title="Número do Cliente" placeholder="Digite o número do cliente" />
+    </div>
+    <button ng-click="buscarCliente()">Buscar Cliente</button>
+  </div>
+
+  <div ng-show="clienteEncontrado">
+    <div class="cliente-card">
+      <h3>Nome: {{cliente.nome}}</h3>
+      <p>Empresa: {{cliente.empresa}}</p>
+      <p>CNPJ: {{cliente.cnpj}}</p>
+      <div class="form-container">
+        <div class="form-group">
+          <label for="valorTotal">Valor Total:</label>
+          <input type="text" id="valorTotal" ng-model="cliente.valorTotal" title="Valor Total" placeholder="Digite o valor total" />
+        </div>
+        <div class="form-group">
+          <label for="quantidadeParcelas">Quantidade de Parcelas:</label>
+          <input type="text" id="quantidadeParcelas" ng-model="cliente.quantidadeParcelas" title="Quantidade de Parcelas" placeholder="Digite a quantidade de parcelas" />
+        </div>
+        <div class="form-group">
+          <label for="vencimentoPrimeiraParcela">Vencimento da Primeira Parcela:</label>
+          <input type="date" id="vencimentoPrimeiraParcela" ng-model="cliente.vencimentoPrimeiraParcela" title="Vencimento da Primeira Parcela" />
+        </div>
+        <button ng-click="emitirBoleto()">Gerar</button>
+      </div>
+    </div>
+  </div>
+
+  <div ng-show="clienteConfirmado">
+    <div class="cliente-card">
+      <h3>Nome: {{cliente.nome}}</h3>
+      <p>Empresa: {{cliente.empresa}}</p>
+      <p>CNPJ: {{cliente.cnpj}}</p>
+      <p>Valor Total: R$ {{cliente.valorTotal}}</p>
+      <p>Quantidade de Parcelas: {{cliente.quantidadeParcelas}}</p>
+      <p>Vencimento da Primeira Parcela: {{cliente.vencimentoPrimeiraParcela}}</p>
+      <button ng-click="confirmarBoleto()">Confirmar Boleto</button>
+    </div>
+  </div>
+
+  <div ng-show="clientesAtivos.length > 0">
+    <h2>Clientes Ativos</h2>
+    <div class="cliente-card" ng-repeat="cliente in clientesAtivos">
+      <h3>Nome: {{cliente.nome}}</h3>
+      <p>Empresa: {{cliente.empresa}}</p>
+      <p>CNPJ: {{cliente.cnpj}}</p>
+      <p>Valor Total: R$ {{cliente.valorTotal}}</p>
+      <p>Qtd de parcelas: {{cliente.quantidadeParcelas}}</p>
+      <h4>Boletos</h4>
+      <div class="boletos-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Número do Boleto</th>
+              <th>Parcela</th>
+              <th>Data de Vencimento</th>
+              <th>Nova data de Vencimento</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="boleto in cliente.boletos[0].parcelasDetalhes">
+              <td>{{boleto.numeroBoleto}}</td>
+              <td>{{boleto.numero}}</td>
+              <td>{{boleto.dataVencimento | date:'dd/MM/yyyy'}}</td>
+              <td>
+                <input type="date" ng-model="boleto.novaDataEmissao" title="Nova Data de Emissão" placeholder="Digite a nova data de emissão" ng-change="calcularValorParcela(boleto)" />
+              </td>
+              <td>
+                <button class="seta" ng-click="gerarSegundaVia(boleto)">Emita 2ª via do boleto</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="alerta" ng-show="boletoGerado">Novo boleto gerado com sucesso!</div>
+</div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
+<script src="./controllers/emissaoBoletosController.js"></script>
+
+
+</body>
+
+</html>

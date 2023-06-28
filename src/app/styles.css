@@ -1,0 +1,101 @@
+/* .container {
+  width: 80%;
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+}
+
+.header {
+  background-color: rgb(100, 0, 97);
+  color: white;
+  padding: 10px;
+}
+
+.cliente-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+button {
+  margin-top: 10px;
+} */
+*{
+  margin:0;
+}
+.header {
+  background-color: rgb(2, 49, 49);
+  color: white;
+  padding: 10px;
+}
+
+.container {
+  width: 80%;
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+}
+
+.form-container {
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.cliente-card {
+  border: 1px solid #000000;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.boletos-container {
+  margin-top: 10px;
+}
+
+.boleto-card {
+  border: 1px solid #cccccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 5px 10px;
+  background-color: #3006c7;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #010136;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #ddd;
+}
