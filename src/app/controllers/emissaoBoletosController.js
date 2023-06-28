@@ -93,70 +93,101 @@ angular.module('meuApp', []).controller('emissaoBoletosController', function($sc
     localStorage.setItem('boletos', JSON.stringify(clientes));
   };
 
-  // ...
+  $scope.buscarCliente = function() {
+    const codigoCliente = $scope.cliente.codigoCliente;
+    const clienteEncontrado = clientes.find(function(cliente) {
+      return cliente.codigo === codigoCliente;
+    });
 
-$scope.buscarCliente = function() {
-  const codigoCliente = $scope.cliente.codigoCliente;
-  const clienteEncontrado = clientes.find(function(cliente) {
-    return cliente.codigo === codigoCliente;
-  });
-
-  if (clienteEncontrado) {
-    $scope.cliente = angular.copy(clienteEncontrado);
-    $scope.clienteEncontrado = true;
-  } else {
-    reiniciarTela();
-    $scope.clienteEncontrado = false;
-  }
-};
-
-$scope.emitirBoleto = function() {
-  const novoBoleto = {
-    valor: $scope.cliente.valorParcela,
-    vencimento: $scope.cliente.vencimentoPrimeiraParcela,
-    status: 'pendente'
+    if (clienteEncontrado) {
+      $scope.cliente = angular.copy(clienteEncontrado);
+      $scope.clienteEncontrado = true;
+    } else {
+      $scope.clienteEncontrado = false;
+      $scope.cliente.nome = '';
+      $scope.cliente.empresa = '';
+      $scope.cliente.cnpj = '';
+    }
   };
 
-  $scope.cliente.boletos.push(novoBoleto);
+  $scope.emitirBoleto = function() {
+    $scope.clienteConfirmado = true;
+  };
 
-  $scope.cliente.valorTotal = calcularValorTotal();
-  $scope.cliente.novoValor = $scope.cliente.valorTotal;
+  $scope.confirmarBoleto = function() {
+    const boleto = {
+      data1parcela: new Date().toISOString().substring(0, 10),
+      nome: $scope.cliente.nome,
+      empresa: $scope.cliente.empresa,
+      cnpj: $scope.cliente.cnpj,
+      valorTotal: $scope.cliente.valorTotal,
+      parcelas: $scope.cliente.quantidadeParcelas,
+      valorParcelas: ($scope.cliente.valorTotal / $scope.cliente.quantidadeParcelas).toFixed(2),
+      parcelasDetalhes: []
+    };
 
-  salvarClientesAtivos(clientes);
+    // Gerar parcelas
+    const primeiraParcela = new Date($scope.cliente.vencimentoPrimeiraParcela);
+    for (let i = 0; i < $scope.cliente.quantidadeParcelas; i++) {
+      const numeroBoleto = Math.floor(Math.random() * 1000000);
+      const parcela = {
+        numero: i + 1,
+        numeroBoleto: numeroBoleto,
+        dataVencimento: new Date(primeiraParcela.getFullYear(), primeiraParcela.getMonth() + i, primeiraParcela.getDate()),
+        dataEmissao: new Date(),
+        juros: 0,
+        desconto: 0
+      };
+      boleto.parcelasDetalhes.push(parcela);
+    }
+
+    $scope.cliente.boletos.push(boleto);
+    $scope.clientesAtivos.push(angular.copy($scope.cliente));
+    salvarClientesAtivos($scope.clientesAtivos);
+    alert('Boletos gerados com sucesso!');
+    reiniciarTela();
+  };
+
+  $scope.clientesAtivos = obterClientesAtivos();
+  $scope.mostrarClientesAtivos = $scope.clientesAtivos.length > 0;
+
+  $scope.calcularValorTotal = function() {
+    $scope.cliente.valorTotal = $scope.cliente.valorTotal + ($scope.cliente.valorTotal * ($scope.cliente.juros / 100));
+    $scope.cliente.valorTotal = $scope.cliente.valorTotal - ($scope.cliente.valorTotal * ($scope.cliente.descontos / 100));
+  };
+
+  $scope.adicionarParcela = function() {
+    const parcela = {
+      numero: $scope.cliente.boletos[0].parcelasDetalhes.length + 1,
+      dataEmissao: new Date(),
+      juros: 0,
+      desconto: 0
+    };
+    $scope.cliente.boletos[0].parcelasDetalhes.push(parcela);
+    salvarClientesAtivos($scope.clientesAtivos);
+  };
+
+  $scope.gerarSegundaVia = function(parcela) {
+    $scope.cliente.novaDataEmissao = parcela.novaDataEmissao; // Salva a nova data de emissão no estado do cliente
+    const novaDataEmissao = new Date(parcela.novaDataEmissao);
+    const dataOriginalVencimento = new Date(parcela.dataVencimento);
+    const diffDias = Math.ceil((novaDataEmissao - dataOriginalVencimento) / (1000 * 60 * 60 * 24));
+    let juros = 0;
+    let desconto = 0;
+
+    if (diffDias > 3) {
+      juros = parcela.valorParcela * 0.02;
+    } else if (novaDataEmissao > dataOriginalVencimento) {
+      const diffDiasVencimento = Math.floor((novaDataEmissao - dataOriginalVencimento) / (1000 * 60 * 60 * 24));
+      if (diffDiasVencimento >= 30) {
+        desconto = parcela.valorParcela * 0.05;
+      }
+    }
+
+    const novoValor = parcela.valorParcela + juros - desconto;
+    alert(`Valor Atualizado: R$ ${novoValor.toFixed(2)}\nJuros: R$ ${juros.toFixed(2)}\nDesconto: R$ ${desconto.toFixed(2)}`);
+  };
+
+  // Inicialização
   reiniciarTela();
-};
-
-$scope.aplicarDesconto = function() {
-  const desconto = $scope.cliente.descontos;
-  $scope.cliente.novoValor = $scope.cliente.valorTotal - desconto;
-};
-
-$scope.aplicarJuros = function() {
-  const juros = $scope.cliente.juros;
-  $scope.cliente.novoValor = $scope.cliente.valorTotal * (1 + juros / 100);
-};
-
-$scope.alterarDataEmissao = function() {
-  const novaDataEmissao = $scope.cliente.novaDataEmissao;
-  const boletos = $scope.cliente.boletos;
-
-  for (let i = 0; i < boletos.length; i++) {
-    boletos[i].emissao = novaDataEmissao;
-  }
-
-  salvarClientesAtivos(clientes);
-};
-
-const calcularValorTotal = function() {
-  const boletos = $scope.cliente.boletos;
-  let valorTotal = 0;
-
-  for (let i = 0; i < boletos.length; i++) {
-    valorTotal += boletos[i].valor;
-  }
-
-  return valorTotal;
-};
-
-reiniciarTela();
 });
